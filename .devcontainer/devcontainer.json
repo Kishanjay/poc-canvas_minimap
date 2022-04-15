@@ -29,5 +29,8 @@
 	"features": {
 		"git": "latest",
 		"github-cli": "latest"
-	}
+	},
+
+	// Use our ssh keys
+	"mounts": ["source=${localEnv:HOME}/.ssh,target=/home/node/.ssh,type=bind,consistency=cached"]
 }
