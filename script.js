@@ -2,27 +2,34 @@ const svg = document.getElementById("svg");
 
 let dragging = false;
 
-let previousMoveX;
-let previousMoveY;
+let lastPanX;
+let lastPanY;
+
+const { clientWidth, clientHeight } = svg;
 
 svg.addEventListener("mousedown", (ev) => {
     dragging = true;
 
-    previousMoveX = ev.clientX;
-    previousMoveY = ev.clientY;
+    lastPanX = ev.clientX;
+    lastPanY = ev.clientY;
 })
 
 
 document.addEventListener("mousemove", (ev) => {
     if (!dragging) { return }
-    let [curX, curY, width, height] = svg.getAttribute("viewBox").split(" ").map(Number);
+    let [viewBoxX, viewBoxY, viewBoxWidth, viewBoxHeight] = svg.getAttribute("viewBox").split(" ").map(Number);
 
-    const deltaX = previousMoveX - ev.clientX;
-    const deltaY = previousMoveY - ev.clientY;
-    previousMoveX = ev.clientX;
-    previousMoveY = ev.clientY;
+    // Intuition: if we're projecting everything at twice the size, we need to pan twice as fast.
+    const widthScale = viewBoxWidth / clientWidth;
+    const heightScale = viewBoxHeight / clientHeight;
 
-    svg.setAttribute("viewBox", `${curX +deltaX } ${curY +deltaY} ${width} ${height}`)
+    const panDeltaX = (lastPanX - ev.clientX) * widthScale;
+    const panDeltaY = (lastPanY - ev.clientY) * heightScale;
+
+    svg.setAttribute("viewBox", `${viewBoxX +panDeltaX } ${viewBoxY +panDeltaY} ${viewBoxWidth} ${viewBoxHeight}`)
+
+    lastPanX = ev.clientX;
+    lastPanY = ev.clientY;
 })
 
 document.addEventListener("mouseup", () => {
