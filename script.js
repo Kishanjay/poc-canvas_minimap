@@ -1,30 +1,57 @@
 const svg = document.getElementById("svg");
 
-let down = false;
-let downX = 0;
-let downY = 0;
+let dragging = false;
 
-let x = 0;
-let y = 0;
+let previousMoveX;
+let previousMoveY;
+
+svg.addEventListener("mousedown", (ev) => {
+    dragging = true;
+
+    previousMoveX = ev.clientX;
+    previousMoveY = ev.clientY;
+})
 
 
 document.addEventListener("mousemove", (ev) => {
-    if (!down) { return }
+    if (!dragging) { return }
+    let [curX, curY, width, height] = svg.getAttribute("viewBox").split(" ").map(Number);
 
-    const dX = downX - ev.clientX;
-    const dY = downY - ev.clientY;
-    svg.setAttribute("viewBox", `${x +dX } ${y +dY} 350 350`)
-})
+    const deltaX = previousMoveX - ev.clientX;
+    const deltaY = previousMoveY - ev.clientY;
+    previousMoveX = ev.clientX;
+    previousMoveY = ev.clientY;
 
-svg.addEventListener("mousedown", (ev) => {
-    down = true;
-    downX = ev.clientX;
-    downY = ev.clientY;
+    svg.setAttribute("viewBox", `${curX +deltaX } ${curY +deltaY} ${width} ${height}`)
 })
 
 document.addEventListener("mouseup", () => {
-    [x, y] = svg.getAttribute("viewBox").split(" ").map(Number)
-    down = false;
+    dragging = false;
 })
+
+
+
+svg.addEventListener("wheel", ev => {
+    const [x, y, width, height] = svg.getAttribute("viewBox").split(" ").map(Number);
+    const factor = ev.deltaY;
+
+    const newWidth = Math.max(width + factor, 1);
+    const newHeight = height * (newWidth / width);
+
+    const deltaWidth = newWidth - width;
+    const deltaHeight = newHeight - height;
+
+    console.log({deltaHeight, deltaWidth})
+
+    const { layerX, layerY} = ev;
+    
+
+    const newX = x - deltaWidth / 2;
+    const newY = y - deltaHeight / 2;
+
+    svg.setAttribute("viewBox", `${newX} ${newY} ${newWidth} ${newHeight}`)
+})
+
+
 
 console.log("ready")
