@@ -39,24 +39,40 @@ document.addEventListener("mouseup", () => {
 
 
 svg.addEventListener("wheel", ev => {
-    const [x, y, width, height] = svg.getAttribute("viewBox").split(" ").map(Number);
-    const factor = ev.deltaY;
+    const [viewBoxX, viewBoxY, viewBoxWidth, viewBoxHeight] = svg.getAttribute("viewBox").split(" ").map(Number);
 
-    const newWidth = Math.max(width + factor, 1);
-    const newHeight = height * (newWidth / width);
+    // Grow relative to the current size. This means that if the size is bigger, we're zooming in relative at the same speed
+    // as we do when the size is small.
+    const wheelSpeed = viewBoxWidth*0.005; 
 
-    const deltaWidth = newWidth - width;
-    const deltaHeight = newHeight - height;
+    // Multiply the scrolling velocity with the relative wheelSpeed to comeup with a scaled increment value
+    // NOTE: can be a negative value
+    const increment = ev.deltaY * wheelSpeed;
+    
+    // When zooming out, ensure that we leave at least 1px
+    const newViewBoxWidth = Math.max(viewBoxWidth + increment, 1);
 
-    console.log({deltaHeight, deltaWidth})
+    // Scale the height at the same speed as the width
+    const viewBoxScaleFactor = (newViewBoxWidth / viewBoxWidth)
+    const newViewBoxHeight = viewBoxHeight * viewBoxScaleFactor;
+
+    // Now we know the desired width and height, we know the delta width and height.
+    // === how much more (or less) pixels we want to see.
+    const deltaWidth = newViewBoxWidth - viewBoxWidth;
+    const deltaHeight = newViewBoxHeight - viewBoxHeight;
 
     const { layerX, layerY} = ev;
-    
 
-    const newX = x - deltaWidth / 2;
-    const newY = y - deltaHeight / 2;
+    // Based on our mouse position we calculate how much of the deltas should be added to the left side (and the right side).
+    // the intuition here is that if our mouse is at the left most position the increment should be added 100% on the rightside.
+    // Thus the ratio is our mouse position relative to the width.
+    const leftSideRatio = layerX / clientWidth;
+    const rightSideRatio = layerY / clientHeight;
 
-    svg.setAttribute("viewBox", `${newX} ${newY} ${newWidth} ${newHeight}`)
+    const newViewBoxX = viewBoxX - (deltaWidth * leftSideRatio);
+    const newViewBoxY = viewBoxY - (deltaHeight * rightSideRatio);
+
+    svg.setAttribute("viewBox", `${newViewBoxX} ${newViewBoxY} ${newViewBoxWidth} ${newViewBoxHeight}`)
 })
 
 
