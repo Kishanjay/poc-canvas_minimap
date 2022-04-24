@@ -61,6 +61,8 @@ export default class SvgPanZoom extends EventEmitter {
     })
 
     svgElement.addEventListener("wheel",  ev => {
+      const [viewBoxX, viewBoxY, viewBoxWidth, viewBoxHeight] = this.#svgElement.getAttribute("viewBox").split(" ").map(Number);
+
       // Use the mouse position relative to the svg element.
       const { layerX: mouseX, layerY: mouseY} = ev;
       
@@ -69,50 +71,41 @@ export default class SvgPanZoom extends EventEmitter {
       const leftSideRatio = mouseX / this.#svgElement.clientWidth;
       const topSideRatio = mouseY / this.#svgElement.clientHeight;
 
-      this.zoom(ev.deltaY, leftSideRatio, topSideRatio);
+      // ev.deltaY is positive on zooming out and negative on zooming in.
+      // therefore this -10 < value < 10 should be flipped and normalised to ratios
+      const zoomPercentage = ev.deltaY * -1;
+      
+      this.zoom(zoomPercentage * 0.01, leftSideRatio, topSideRatio);
     })
 
     this.#svgElement = svgElement
     this.#svgElement.pinchifier = this;
   }
 
-  zoom(factor, leftSideRatio = 0.5, topSideRatio = 0.5) {
+  zoom(zoomRatio, leftSideRatio = 0.5, topSideRatio = 0.5) {
     const [viewBoxX, viewBoxY, viewBoxWidth, viewBoxHeight] = this.#svgElement.getAttribute("viewBox").split(" ").map(Number);
 
-    // Grow relative to the current projected size. This means that if the size is bigger, we're zooming in relative at the same 
-    // speed as we do when the size is small.
-    const zoomSpeed = viewBoxWidth*0.005; 
+    // Calculate how much width and height should be added to the viewBox
+    // Intution: zooming in with a factor 0.10, means that the viewBox should become 10% smaller
+    const deltaViewBoxWidth = viewBoxWidth * zoomRatio * -1;
+    const deltaViewBoxHeight = viewBoxHeight * zoomRatio * -1;
 
-    // Multiply the scrolling velocity with the relative wheelSpeed to comeup with a scaled increment value
-    // NOTE: can be a negative value.
-    const sizeIncrement = factor * zoomSpeed;
-    
-    // Compute the new width by adding the increment. Ensure to leave at LEAST 1px when zooming in.
-    const newViewBoxWidth = Math.max(viewBoxWidth + sizeIncrement, 1);
+    // Calculate the new viewBox width and height based on the zoomRatio.
+    // Intuition: when zooming in the viewBox is showing less pixels
+    const newViewBoxWidth = viewBoxWidth + deltaViewBoxWidth;
+    const newViewBoxHeight = viewBoxHeight + deltaViewBoxHeight;
 
-    // Scale the height exactly as much as the width.
-    const viewBoxScaleFactor = (newViewBoxWidth / viewBoxWidth)
-    const newViewBoxHeight = viewBoxHeight * viewBoxScaleFactor;
-
-    // Now we know the desired width and height, we know the delta width and height.
-    // === how much more (or less) pixels we want to see.
-
-    // Based on the new widths and heights, compute the relative deltas. (=== new - old)
-    const deltaWidth = newViewBoxWidth - viewBoxWidth;
-    const deltaHeight = newViewBoxHeight - viewBoxHeight;
-
-    // Compute how much of the deltaIncrement should go to each of the 4 sides. 0.5 means zooming in and out from
-    // the very center position
-    const newViewBoxX = viewBoxX - (deltaWidth * leftSideRatio);
-    const newViewBoxY = viewBoxY - (deltaHeight * topSideRatio);
+    // Calculate the new x and y positions based on the left and top side ratios
+    // Intuition: zooming in on the left means that the viewBoxWidth gets smaller
+    //  which means that deltaViewBoxWidth is < 0. 
+    //  which means that viewBoxX should increase.
+    //  therefore 
+    const newViewBoxX = viewBoxX + (-1 * deltaViewBoxWidth * leftSideRatio);
+    const newViewBoxY = viewBoxY + (-1 * deltaViewBoxHeight * topSideRatio);
 
     this.#svgElement.setAttribute("viewBox", `${newViewBoxX} ${newViewBoxY} ${newViewBoxWidth} ${newViewBoxHeight}`)
 
     this.$emit("zoom", this.scale);
-  }
-
-  pan() {
-
   }
 
   get scale() {

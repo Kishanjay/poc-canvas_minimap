@@ -39,10 +39,10 @@
       document.getElementById("scale").innerHTML = scale;
     })
     document.getElementById("zoomin").addEventListener("click", () => {
-      svgPanZoom.zoom(-100)
+      svgPanZoom.zoom(0.1)
     })
     document.getElementById("zoomout").addEventListener("click", () => {
-      svgPanZoom.zoom(100)
+      svgPanZoom.zoom(-0.1)
     })
   </script>
   <!-- <script src="script.js"></script> -->
