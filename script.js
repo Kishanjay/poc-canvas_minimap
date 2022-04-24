@@ -1,5 +1,11 @@
 const svg = document.getElementById("svg");
 
+const viewBox = svg.getAttribute("viewBox");
+console.log({viewBox})
+if (!viewBox) {
+    svg.setAttribute("viewBox", `0 0 ${svg.clientWidth} ${svg.clientHeight}`)
+}
+
 let dragging = false;
 
 let lastPanX;

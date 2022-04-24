@@ -20,11 +20,31 @@
   </style>
 </head>
 <body>
-  <svg id="svg" width="1000" height="600" viewBox="0 0 500 300" preserveAspectRatio="none">
+  <svg id="svg" width="1000" height="600" preserveAspectRatio="none">
     <ellipse cx="50" cy="50" rx="50" ry="50"></ellipse>
     <ellipse cx="250" cy="250" rx="150" ry="150"></ellipse>
   </svg>
+  <div>
+    <button id="zoomin">+</button>
+    <div id="scale"></div>
+    <button id="zoomout">-</button>
+  </div>
 
-  <script type="module" src="script.js"></script>
+  <script type="module">
+    import SvgPanZoom from "./svg-pan-zoom.mjs"
+    
+    const svgPanZoom = new SvgPanZoom(document.getElementById("svg"))
+
+    svgPanZoom.on("zoom", (scale) => {
+      document.getElementById("scale").innerHTML = scale;
+    })
+    document.getElementById("zoomin").addEventListener("click", () => {
+      svgPanZoom.zoom(-100)
+    })
+    document.getElementById("zoomout").addEventListener("click", () => {
+      svgPanZoom.zoom(100)
+    })
+  </script>
+  <!-- <script src="script.js"></script> -->
 </body>
 </html>

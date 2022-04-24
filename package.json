@@ -18,6 +18,8 @@
   },
   "homepage": "https://github.com/Kishanjay/poc-canvas_minimap#readme",
   "dependencies": {
+    "@kjn/event-emitter": "^1.0.1",
+    "@kjn/logger": "^1.0.0",
     "parcel": "^2.3.2"
   }
 }
