@@ -21,7 +21,7 @@
   "dependencies": {
     "@kjn/event-emitter": "^1.0.1",
     "@kjn/logger": "^1.0.0",
-    "@kjn/svg-pan-zoom": "^1.0.0",
+    "@kjn/svg-pan-zoom": "^1.1.5",
     "parcel": "^2.3.2"
   }
 }
