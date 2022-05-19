@@ -36,7 +36,7 @@
     <ellipse cx="115.779" cy="155.778" rx="36" ry="60" fill="transparent" stroke="blue"/>
   </svg>
 
-  <svg id="minimap" width="300" height="300">
+  <svg id="minimap" width="100" height="100">
   </svg>
   <div>
     <button id="zoomin">+</button>
@@ -45,19 +45,19 @@
   </div>
 
   <script type="module">
-    import SvgPanZoom from "@kjn/svg-pan-zoom"
+    // import SvgPanZoom from "@kjn/svg-pan-zoom"
     
-    const svgPanZoom = new SvgPanZoom(document.getElementById("svg"))
+    // const svgPanZoom = new SvgPanZoom(document.getElementById("svg"))
 
-    svgPanZoom.on("zoom", (scale) => {
-      document.getElementById("scale").innerHTML = scale;
-    })
-    document.getElementById("zoomin").addEventListener("click", () => {
-      svgPanZoom.zoom(0.1)
-    })
-    document.getElementById("zoomout").addEventListener("click", () => {
-      svgPanZoom.zoom(-0.1)
-    })
+    // svgPanZoom.on("zoom", (scale) => {
+    //   document.getElementById("scale").innerHTML = scale;
+    // })
+    // document.getElementById("zoomin").addEventListener("click", () => {
+    //   svgPanZoom.zoom(0.1)
+    // })
+    // document.getElementById("zoomout").addEventListener("click", () => {
+    //   svgPanZoom.zoom(-0.1)
+    // })
   </script>
   <script type="module" src="script.js"></script>
 </body>
