@@ -31,6 +31,6 @@
 		"github-cli": "latest"
 	},
 
-	// Use our ssh keys
+	// Use our ssh keys without the need to have a running ssh-agent locally
 	"mounts": ["source=${localEnv:HOME}/.ssh,target=/home/node/.ssh,type=bind,consistency=cached"]
 }
